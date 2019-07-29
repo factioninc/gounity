@@ -15,6 +15,11 @@ type attachSnapshotResourceResp struct {
 	Id string `json:"id"`
 }
 
+type AttachSnapshotRequest struct {
+	Host          *Host
+	AllowedAccess SnapAccessLevelEnum
+}
+
 func newCreateSnapshotBody(s *Snap, sr *StorageResource) map[string]interface{} {
 	body := map[string]interface{}{
 		"name":            s.Name,
@@ -83,18 +88,35 @@ func (s *Snap) Copy(copyName string) (*Snap, error) {
 }
 
 func (s *Snap) AttachToHost(host *Host, access SnapAccessLevelEnum) (string, error) {
-	hostAccess := []interface{}{
-		map[string]interface{}{
-			"host":          *host.Repr(),
-			"allowedAccess": access,
+	hostRequests := []*AttachSnapshotRequest{
+		{
+			Host:          host,
+			AllowedAccess: access,
 		},
 	}
 
-	fields := map[string]interface{}{
-		"requestBody": hostAccess,
+	return s.AttachToHosts(hostRequests)
+}
+
+func (s *Snap) AttachToHosts(hostRequests []*AttachSnapshotRequest) (string, error) {
+	if hostRequests == nil || len(hostRequests) == 0 {
+		return "", nil
 	}
 
-	body := map[string]interface{}{"hostAccess": hostAccess}
+	hostAccesses := []interface{}{}
+
+	for _, hostRequest := range hostRequests {
+		hostAccesses = append(hostAccesses, map[string]interface{}{
+			"host":          *hostRequest.Host.Repr(),
+			"allowedAccess": hostRequest.AllowedAccess,
+		})
+	}
+
+	fields := map[string]interface{}{
+		"requestBody": hostAccesses,
+	}
+
+	body := map[string]interface{}{"hostAccess": hostAccesses}
 
 	log := logrus.WithFields(fields)
 	msg := newMessage().withFields(fields)
