@@ -88,33 +88,14 @@ func (s *Snap) Copy(copyName string) (*Snap, error) {
 }
 
 func (s *Snap) AttachToHost(host *Host, access SnapAccessLevelEnum) (string, error) {
-	hostAccess := []interface{}{
-		map[string]interface{}{
-			"host":          *host.Repr(),
-			"allowedAccess": access,
+	hostRequests := []*AttachSnapshotRequest{
+		{
+			Host:          host,
+			AllowedAccess: access,
 		},
 	}
 
-	fields := map[string]interface{}{
-		"requestBody": hostAccess,
-	}
-
-	body := map[string]interface{}{"hostAccess": hostAccess}
-
-	log := logrus.WithFields(fields)
-	msg := newMessage().withFields(fields)
-
-	log.Debug("attaching snapshot")
-	resp := &attachSnapshotResourceResp{}
-	err := s.Unity.PostOnInstance(
-		typeNameSnap, s.Id, "attach", body, resp,
-	)
-	if err != nil {
-		return "", errors.Wrapf(err, "attaching snapshot failed: %s", msg)
-	}
-
-	log.WithField("copySnapId", s.Id).Debug("Snapshot successfully attached")
-	return resp.Id, nil
+	return s.AttachToHosts(hostRequests)
 }
 
 func (s *Snap) AttachToHosts(hostRequests []*AttachSnapshotRequest) (string, error) {
