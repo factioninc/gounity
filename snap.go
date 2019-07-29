@@ -15,6 +15,11 @@ type attachSnapshotResourceResp struct {
 	Id string `json:"id"`
 }
 
+type AttachSnapshotRequest struct {
+	Host          *Host
+	AllowedAccess SnapAccessLevelEnum
+}
+
 func newCreateSnapshotBody(s *Snap, sr *StorageResource) map[string]interface{} {
 	body := map[string]interface{}{
 		"name":            s.Name,
@@ -95,6 +100,42 @@ func (s *Snap) AttachToHost(host *Host, access SnapAccessLevelEnum) (string, err
 	}
 
 	body := map[string]interface{}{"hostAccess": hostAccess}
+
+	log := logrus.WithFields(fields)
+	msg := newMessage().withFields(fields)
+
+	log.Debug("attaching snapshot")
+	resp := &attachSnapshotResourceResp{}
+	err := s.Unity.PostOnInstance(
+		typeNameSnap, s.Id, "attach", body, resp,
+	)
+	if err != nil {
+		return "", errors.Wrapf(err, "attaching snapshot failed: %s", msg)
+	}
+
+	log.WithField("copySnapId", s.Id).Debug("Snapshot successfully attached")
+	return resp.Id, nil
+}
+
+func (s *Snap) AttachToHosts(hostRequests []*AttachSnapshotRequest) (string, error) {
+	if hostRequests == nil || len(hostRequests) == 0 {
+		return "", nil
+	}
+
+	hostAccesses := []interface{}{}
+
+	for _, hostRequest := range hostRequests {
+		hostAccesses = append(hostAccesses, map[string]interface{}{
+			"host":          *hostRequest.Host.Repr(),
+			"allowedAccess": hostRequest.AllowedAccess,
+		})
+	}
+
+	fields := map[string]interface{}{
+		"requestBody": hostAccesses,
+	}
+
+	body := map[string]interface{}{"hostAccess": hostAccesses}
 
 	log := logrus.WithFields(fields)
 	msg := newMessage().withFields(fields)
