@@ -160,30 +160,8 @@ func (s *Snap) AttachToHostsInJob(hostRequests []*AttachSnapshotRequest) {
 	s.Unity.PostOnInstanceInJob(typeNameSnap, s.Id, "attach", body)
 }
 
-func (s *Snap) AttachToHostInJob(hostRequests []*AttachSnapshotRequest) {
-	if hostRequests == nil || len(hostRequests) == 0 {
-		return
-	}
-
-	hostAccesses := []interface{}{}
-
-	for _, hostRequest := range hostRequests {
-		hostAccesses = append(hostAccesses, map[string]interface{}{
-			"host":          *hostRequest.Host.Repr(),
-			"allowedAccess": hostRequest.AllowedAccess,
-		})
-	}
-
-	fields := map[string]interface{}{
-		"requestBody": hostAccesses,
-	}
-
-	body := map[string]interface{}{"hostAccess": hostAccesses}
-
-	log := logrus.WithFields(fields)
-
-	log.Debug("attaching snapshot")
-	s.Unity.PostOnInstanceInJob(typeNameSnap, s.Id, "attach", body)
+func (s *Snap) AttachToHostInJob(hostRequest *AttachSnapshotRequest) {
+	s.AttachToHostsInJob([]*AttachSnapshotRequest{hostRequest})
 }
 
 func (s *Snap) DetachFromHost() (string, error) {
