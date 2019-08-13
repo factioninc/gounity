@@ -4,11 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"os"
 	"reflect"
 	"strconv"
-
-	"github.com/pkg/errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -70,6 +69,10 @@ type UnityConnector interface {
 	PostOnInstance(
 		typeName, resId, action string, body map[string]interface{}, resp interface{},
 	) error
+
+	PostOnInstanceInJob(
+		typeName, resId, action string, body map[string]interface{},
+	)
 
 	DeleteInstance(resType, id string) error
 
@@ -331,4 +334,13 @@ func (u *Unity) DeleteInstance(resType, id string) error {
 		return errors.Wrapf(err, "delete instance failed: %s", msg)
 	}
 	return nil
+}
+
+func (u *Unity) PostOnInstanceInJob(typeName, resId, action string, body map[string]interface{}) {
+	go func(typeName, resId, action string, body map[string]interface{}) {
+		err := u.PostOnInstance(typeName, resId, action, body, nil)
+		if err != nil {
+			logrus.Errorf("%s", err)
+		}
+	}(typeName, resId, action, body)
 }
