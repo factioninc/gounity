@@ -29,6 +29,7 @@ type Snap struct {
 	IsAutoDelete    bool                `json:"isAutoDelete"`
 	State           SnapStateEnum       `json:"state"`
 	Size            uint64              `json:"size"`
+	AttachedWWN     *string             `json:"attachedWWN"`
 	HostAccess      []*SnapHostAccess   `json:"hostAccess"`
 }
 
@@ -50,6 +51,7 @@ var (
 		"isAutoDelete",
 		"state",
 		"size",
+		"attachedWWN",
 		"hostAccess",
 	}, ",")
 )
