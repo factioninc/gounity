@@ -22,8 +22,10 @@ type AttachSnapshotRequest struct {
 
 func newCreateSnapshotBody(s *Snap, sr *StorageResource) map[string]interface{} {
 	body := map[string]interface{}{
-		"name":            s.Name,
-		"storageResource": *sr.Repr(),
+		"name":              s.Name,
+		"storageResource":   *sr.Repr(),
+		"isAutoDelete":      s.IsAutoDelete,
+		"retentionDuration": s.RetentionDuration,
 	}
 
 	return body
