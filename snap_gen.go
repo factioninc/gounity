@@ -14,23 +14,24 @@ import (
 type Snap struct {
 	Resource
 
-	Id              string              `json:"id"`
-	Name            string              `json:"name"`
-	Description     string              `json:"description"`
-	StorageResource *StorageResource    `json:"storageResource"`
-	Lun             *Lun                `json:"lun"`
-	CreationTime    string              `json:"creationTime"`
-	ExpirationTime  string              `json:"expirationTime"`
-	CreatorType     SnapCreatorTypeEnum `json:"creatorType"`
-	IsSystemSnap    bool                `json:"isSystemSnap"`
-	IsModifiable    bool                `json:"isModifiable"`
-	IsReadOnly      bool                `json:"isReadOnly"`
-	IsModified      bool                `json:"isModified"`
-	IsAutoDelete    bool                `json:"isAutoDelete"`
-	State           SnapStateEnum       `json:"state"`
-	Size            uint64              `json:"size"`
-	AttachedWWN     *string             `json:"attachedWWN"`
-	HostAccess      []*SnapHostAccess   `json:"hostAccess"`
+	Id                string              `json:"id"`
+	Name              string              `json:"name"`
+	Description       string              `json:"description"`
+	StorageResource   *StorageResource    `json:"storageResource"`
+	Lun               *Lun                `json:"lun"`
+	CreationTime      string              `json:"creationTime"`
+	ExpirationTime    string              `json:"expirationTime"`
+	RetentionDuration uint64              `json:"retentionDuration"`
+	CreatorType       SnapCreatorTypeEnum `json:"creatorType"`
+	IsSystemSnap      bool                `json:"isSystemSnap"`
+	IsModifiable      bool                `json:"isModifiable"`
+	IsReadOnly        bool                `json:"isReadOnly"`
+	IsModified        bool                `json:"isModified"`
+	IsAutoDelete      bool                `json:"isAutoDelete"`
+	State             SnapStateEnum       `json:"state"`
+	Size              uint64              `json:"size"`
+	AttachedWWN       *string             `json:"attachedWWN"`
+	HostAccess        []*SnapHostAccess   `json:"hostAccess"`
 }
 
 var (
@@ -43,6 +44,7 @@ var (
 		"lun",
 		"creationTime",
 		"expirationTime",
+		"retentionDuration",
 		"creatorType",
 		"isSystemSnap",
 		"isModifiable",
