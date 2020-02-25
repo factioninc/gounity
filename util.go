@@ -113,7 +113,7 @@ func postInstanceUrl(typeName, resId, action string) string {
 	}
 
 	if action == "modify" {
-		return strings.Join([]string{joinPath, "timeout=5"}, "?")
+		return strings.Join([]string{joinPath, "timeout=5&compact=true&visibility=Engineering"}, "?")
 	}
 	return joinPath
 }

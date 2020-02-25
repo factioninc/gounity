@@ -75,19 +75,16 @@ func (s *Snap) Modify() (*Snap, error) {
 	msg := newMessage().withFields(fields)
 
 	log.Debug("modifying snapshot")
-	err := s.Unity.PostOnInstance(
-		typeNameSnap, s.Id, "modify", body, nil,
+	s.Unity.PostOnInstanceInJob(
+		typeNameSnap, s.Id, "modify", body,
 	)
-	if err != nil {
-		return nil, errors.Wrapf(err, "modifying snapshot failed: %s", msg)
-	}
 
 	snap := s.Unity.NewSnapById(s.Id)
-	if err = snap.Refresh(); err != nil {
+	if err := snap.Refresh(); err != nil {
 		return nil, errors.Wrapf(err, "get snapshot failed: %s", msg)
 	}
 	log.WithField("snapId", snap.Id).Debug("Snapshot successfully modified")
-	return snap, err
+	return snap, nil
 }
 
 func (s *Snap) Copy(copyName string) (*Snap, error) {
