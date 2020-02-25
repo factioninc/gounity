@@ -15,6 +15,10 @@ type attachSnapshotResourceResp struct {
 	Id string `json:"id"`
 }
 
+type modifySnapshotResourceResp struct {
+	Id string `json:"id"`
+}
+
 type AttachSnapshotRequest struct {
 	Host          *Host
 	AllowedAccess SnapAccessLevelEnum
@@ -61,9 +65,9 @@ func (s *Snap) Create(sr *StorageResource) error {
 
 func (s *Snap) Modify() (*Snap, error) {
 	body := map[string]interface{}{
-		"name": s.Name,
-		"description": s.Description,
-		"isAutoDelete": s.IsAutoDelete,
+		"name":              s.Name,
+		"description":       s.Description,
+		"isAutoDelete":      s.IsAutoDelete,
 		"retentionDuration": s.RetentionDuration,
 	}
 
@@ -75,9 +79,14 @@ func (s *Snap) Modify() (*Snap, error) {
 	msg := newMessage().withFields(fields)
 
 	log.Debug("modifying snapshot")
-	s.Unity.PostOnInstanceInJob(
-		typeNameSnap, s.Id, "modify", body,
+	resp := &modifySnapshotResourceResp{}
+	err := s.Unity.PostOnInstance(
+		typeNameSnap, s.Id, "modify", body, resp,
 	)
+
+	if err != nil {
+		return nil, err
+	}
 
 	snap := s.Unity.NewSnapById(s.Id)
 	if err := snap.Refresh(); err != nil {
