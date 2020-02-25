@@ -111,6 +111,10 @@ func postInstanceUrl(typeName, resId, action string) string {
 	if action == "attach" || action == "detach" {
 		return strings.Join([]string{joinPath, "timeout=1"}, "?")
 	}
+
+	if action == "modify" {
+		return strings.Join([]string{joinPath, "timeout=5"}, "?")
+	}
 	return joinPath
 }
 

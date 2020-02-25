@@ -61,6 +61,8 @@ func (s *Snap) Create(sr *StorageResource) error {
 
 func (s *Snap) Modify() (*Snap, error) {
 	body := map[string]interface{}{
+		"name": s.Name,
+		"description": s.Description,
 		"isAutoDelete": s.IsAutoDelete,
 		"retentionDuration": s.RetentionDuration,
 	}
