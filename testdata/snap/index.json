@@ -19,9 +19,11 @@
     {
       "url": "/api/types/snap/instances",
       "body": {
+        "isAutoDelete:": false,
         "name": "new_snap",
+        "retentionDuration": 0,
         "storageResource": {
-          "id": "sv_1"
+          "Id": "sv_1"
         }
       },
       "response": "snap_3_create.json"

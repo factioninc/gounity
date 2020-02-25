@@ -46,7 +46,7 @@ func (s *Snap) Create(sr *StorageResource) error {
 		return errors.Wrapf(err, "create snapshot failed: %s", err)
 	}
 
-	s = s.Unity.NewSnapById(resp.Content.Id)
+	s.Id = resp.Content.Id
 	err := s.Refresh()
 	if err != nil {
 		return errors.Wrapf(
@@ -57,6 +57,35 @@ func (s *Snap) Create(sr *StorageResource) error {
 		log.WithField("createdSnapshotId", s.Id).Debug("snapshot created")
 	}
 	return err
+}
+
+func (s *Snap) Modify() (*Snap, error) {
+	body := map[string]interface{}{
+		"isAutoDelete": s.IsAutoDelete,
+		"retentionDuration": s.RetentionDuration,
+	}
+
+	fields := map[string]interface{}{
+		"requestBody": body,
+	}
+
+	log := logrus.WithFields(fields)
+	msg := newMessage().withFields(fields)
+
+	log.Debug("modifying snapshot")
+	err := s.Unity.PostOnInstance(
+		typeNameSnap, s.Id, "modify", body, nil,
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "modifying snapshot failed: %s", msg)
+	}
+
+	snap := s.Unity.NewSnapById(s.Id)
+	if err = snap.Refresh(); err != nil {
+		return nil, errors.Wrapf(err, "get snapshot failed: %s", msg)
+	}
+	log.WithField("snapId", snap.Id).Debug("Snapshot successfully modified")
+	return snap, err
 }
 
 func (s *Snap) Copy(copyName string) (*Snap, error) {
@@ -80,6 +109,7 @@ func (s *Snap) Copy(copyName string) (*Snap, error) {
 	}
 
 	snap := s.Unity.NewSnapByName(copyName)
+
 	if err = snap.Refresh(); err != nil {
 		return nil, errors.Wrapf(err, "get snapshot failed: %s", msg)
 	}
