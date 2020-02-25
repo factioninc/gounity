@@ -44,7 +44,6 @@ var (
 		"lun",
 		"creationTime",
 		"expirationTime",
-		"retentionDuration",
 		"creatorType",
 		"isSystemSnap",
 		"isModifiable",
