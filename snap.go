@@ -15,10 +15,6 @@ type attachSnapshotResourceResp struct {
 	Id string `json:"id"`
 }
 
-type modifySnapshotResourceResp struct {
-	Id string `json:"id"`
-}
-
 type AttachSnapshotRequest struct {
 	Host          *Host
 	AllowedAccess SnapAccessLevelEnum
@@ -79,9 +75,8 @@ func (s *Snap) Modify() (*Snap, error) {
 	msg := newMessage().withFields(fields)
 
 	log.Debug("modifying snapshot")
-	resp := &modifySnapshotResourceResp{}
 	err := s.Unity.PostOnInstance(
-		typeNameSnap, s.Id, "modify", body, resp,
+		typeNameSnap, s.Id, "modify", body, nil,
 	)
 
 	if err != nil {
